@@ -1,0 +1,13 @@
+{
+	"appId": "com.mathpracticepro.app",
+	"appName": "Math Practice Pro",
+	"webDir": "dist/public",
+	"ios": {
+		"contentInset": "automatic"
+	},
+	"server": {
+		"androidScheme": "https",
+		"iosScheme": "https"
+	},
+	"packageClassList": []
+}
