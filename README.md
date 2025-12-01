@@ -1,1 +1,1 @@
-Math Pioneers' offial math practice app!
+Math Pioneers' official math practice app!
