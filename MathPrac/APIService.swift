@@ -17,7 +17,7 @@ class APIService {
         }
     }
     
-    func generateProblem(request: ProblemRequest) async throws -> ProblemResponse {
+    func generateProblem(request: ProblemRequest, problemCount: Int? = nil) async throws -> ProblemResponse {
         guard let url = URL(string: "\(groqBaseURL)/chat/completions") else {
             throw APIServiceError.invalidURL
         }
@@ -37,10 +37,20 @@ class APIService {
         - 9-10: Very difficult problems, near the hardest from \(request.competition)
         """
         
+        let randomizers = [
+            "Generate a completely unique and different problem than any typical \(request.competition) problem.",
+            "Think outside the box and create an unusual or creative problem.",
+            "Create a problem with a twist or surprising element.",
+            "Design a problem that tests deeper conceptual understanding rather than routine calculation.",
+            "Consider real-world applications or novel scenarios for this topic."
+        ]
+        
+        let randomPrompt = randomizers.randomElement() ?? ""
+        
         let systemPrompt = "You are an expert math competition problem generator. Generate UNIQUE and DIVERSE problems that match the style and difficulty of real \(request.competition) competition problems."
         
         let topicsList = request.topics.joined(separator: ", ")
-        let userPrompt = """
+        let baseUserPrompt = """
         Generate a single \(request.competition) math problem with the following specifications:
         
         Competition: \(request.competition)
@@ -49,11 +59,20 @@ class APIService {
         
         \(difficultyGuide)
         
+        \(randomPrompt)
+        
         IMPORTANT FORMATTING REQUIREMENTS:
         1. Use LaTeX math notation wrapped in $ for inline math and $$ for display math
         2. The problem should be appropriate for \(request.competition)
         3. Include any necessary diagrams or figures as text descriptions if needed
         4. Make the problem challenging and interesting
+        
+        SPECIFIC REQUIREMENTS TO PREVENT REPETITION:
+        - DO NOT create problems about: "Tom saving money for a bike", "Alice and Bob sharing items", "simple age problems"
+        - DO NOT use common template problems like "Find the area of a triangle with vertices..."
+        - VARY the context: use different names, settings, and scenarios
+        - If using geometry, vary the shapes and configurations
+        - If using algebra, vary the equation types and structures     
         
         ANSWER FORMAT REQUIREMENTS:
         - Provide the answer in the simplest, most standard numerical form
@@ -61,7 +80,17 @@ class APIService {
         - For radicals: use "sqrt(n)" format (e.g., "sqrt(2)")
         - For integers: just the number (e.g., "42")
         - Do NOT use LaTeX notation in the answer field
-
+        
+        CRITICAL LATEX REQUIREMENTS:
+        1. For fractions, use: \\frac{numerator}{denominator} (e.g., \\frac{240}{t})
+        2. NEVER use \\text{rac} or other incorrect commands
+        3. Test that your LaTeX would compile correctly
+        4. Use proper LaTeX commands:
+           - Fractions: \\frac{a}{b}
+           - Square roots: \\sqrt{x}
+           - Exponents: x^{2}
+           - Subscripts: x_{1}
+        
         Respond in JSON format with exactly these fields:
         {
           "problem": "The problem statement with LaTeX math in $ or $$ delimiters",
@@ -69,6 +98,9 @@ class APIService {
           "explanation": "A clear, step-by-step explanation"
         }
         """
+        
+        let countLine = problemCount.map { "\nREMEMBER: This is problem #\($0) for this user. Make it distinct!" } ?? ""
+        let userPrompt = baseUserPrompt + countLine
         
         let requestBody: [String: Any] = [
             "model": "llama-3.3-70b-versatile",
@@ -235,3 +267,4 @@ enum APIServiceError: LocalizedError {
         }
     }
 }
+

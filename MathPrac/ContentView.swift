@@ -35,6 +35,8 @@ struct ContentView: View {
     @State private var feedbackResponse: FeedbackResponse?
 
     @State private var showCompetitionMenu: Bool = false
+    
+    @State private var problemCount: Int = 0
 
     // Task management for cancellation
     @State private var currentGenerateTask: Task<Void, Never>?
@@ -541,6 +543,8 @@ struct ContentView: View {
         feedbackResponse = nil
         userCorrectAnswer = ""
         additionalComment = ""
+        
+        problemCount += 1
 
         let request = ProblemRequest(
             competition: selectedCompetition.rawValue,
@@ -690,6 +694,8 @@ struct ContentView: View {
         result = result.replacingOccurrences(of: "}", with: ")")
         result = result.replacingOccurrences(of: "{", with: "(")
         result = result.replacingOccurrences(of: "\\", with: "")
+        result = result.replacingOccurrences(of: "\\text{rac}", with: "\\frac")
+        result = result.replacingOccurrences(of: "rac{", with: "\\frac{")
         return result
     }
 }
