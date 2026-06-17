@@ -1,5 +1,3 @@
-# Privacy Policy version 1.0 for the MathPrac iOS app
+# Privacy Policy version 1.0 for my iOS apps
 
-The MathPrac iOS app does not collect any user data of any kind.  The app does not access the Internet at all.
-
-If you wish to verify this for yourself, see the source code at https://github.com/sasobhabha/MathPrac
+The iOS apps developed by Shashwath Manjunath do not collect any user data of any kind.  The app does not access the unrestricted web at all. 
